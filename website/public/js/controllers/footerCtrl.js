@@ -1,8 +1,10 @@
 "use strict";
 
 angular.module('habitrpg').controller("FooterCtrl",
-['$scope', '$rootScope', 'User', '$http', 'Notification', 'ApiUrl',
-function($scope, $rootScope, User, $http, Notification, ApiUrl) {
+['$scope', '$rootScope', 'User', '$http', 'Notification', 'ApiUrl', 'Analytics',
+function($scope, $rootScope, User, $http, Notification, ApiUrl, Analytics) {
+
+  $scope.Analytics = Analytics;
 
   if(env.isStaticPage){
     $scope.languages = env.avalaibleLanguages;
@@ -25,7 +27,7 @@ function($scope, $rootScope, User, $http, Notification, ApiUrl) {
     // Stripe
     $.getScript('//checkout.stripe.com/v2/checkout.js');
 
-    // Google Analytics, only in production
+    // Analytics, only in production
     if (window.env.NODE_ENV === 'production') {
       // Get experiments API
       $.getScript('//www.google-analytics.com/cx/api.js?experiment=t-AFggRWQnuJ6Teck_x1-Q', function(){
@@ -39,7 +41,24 @@ function($scope, $rootScope, User, $http, Notification, ApiUrl) {
         ga('create', window.env.GA_ID, {userId:User.user._id});
         ga('require', 'displayfeatures');
         ga('send', 'pageview');
-      })
+      });
+
+      $.getScript('//api.mixpanel.com/site_media/js/api/mixpanel.js', function() {
+        (function(f,b){if(!b.__SV){var a,e,i,g;window.mixpanel=b;b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.union people.track_charge people.clear_charges people.delete_user".split(" ");
+          for(g=0;g<i.length;g++)f(c,i[g]);b._i.push([a,e,d])};b.__SV=1.2;a=f.createElement("script");a.type="text/javascript";a.async=!0;a.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";e=f.getElementsByTagName("script")[0];e.parentNode.insertBefore(a,e)}})(document,window.mixpanel||[]);
+        mixpanel.init(window.env.MIXPANEL_TOKEN);
+      });
+
+      $.getScript('https://d24n15hnbwhuhn.cloudfront.net/libs/amplitude-2.2.0-min.gz.js', function() {
+        (function(e,t){var r=e.amplitude||{};var n=t.createElement("script");n.type="text/javascript";
+          n.async=true;n.src="https://d24n15hnbwhuhn.cloudfront.net/libs/amplitude-2.2.0-min.gz.js";
+          var s=t.getElementsByTagName("script")[0];s.parentNode.insertBefore(n,s);r._q=[];
+          function a(e){r[e]=function(){r._q.push([e].concat(Array.prototype.slice.call(arguments,0)));
+          }}var i=["init","logEvent","logRevenue","setUserId","setUserProperties","setOptOut","setVersionName","setDomain","setDeviceId","setGlobalUserProperties"];
+          for(var o=0;o<i.length;o++){a(i[o])}e.amplitude=r})(window,document);
+
+        amplitude.init(window.env.AMPLITUDE_KEY);
+      });
     }
 
     // Scripts only for desktop

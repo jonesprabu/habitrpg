@@ -19,18 +19,21 @@ describe('Analytics Service', function () {
       sinon.stub(amplitude, 'setUserId');
       sinon.stub(amplitude, 'logEvent');
       sinon.stub(amplitude, 'setUserProperties');
+      sinon.stub(amplitude, 'logRevenue');
     });
 
     afterEach(function() {
       amplitude.setUserId.reset();
       amplitude.logEvent.reset();
       amplitude.setUserProperties.reset();
+      amplitude.logRevenue.reset();
     });
 
     after(function() {
       amplitude.setUserId.restore();
       amplitude.logEvent.restore();
       amplitude.setUserProperties.restore();
+      amplitude.logRevenue.restore();
     });
 
     sinon.stub($, 'getScript').returns(function(name,callback) {
@@ -84,6 +87,12 @@ describe('Analytics Service', function () {
       analytics.updateUser({'userBoolean': false, 'userNumber': -8, 'userString': 'Enlightened'});
       expect(amplitude.setUserProperties).to.have.been.calledOnce;
       expect(amplitude.setUserProperties).to.have.been.calledWith({'userBoolean': false, 'userNumber': -8, 'userString': 'Enlightened'});
+    });
+
+    it('tracks revenue from purchases', function() {
+      analytics.revenue(0.25,20,'Gems');
+      expect(amplitude.logRevenue).to.have.been.calledOnce;
+      expect(amplitude.logRevenue).to.have.been.calledWith(0.25,20,'Gems');
     });
 
   });
@@ -156,31 +165,6 @@ describe('Analytics Service', function () {
       mixpanel.identify.restore();
       mixpanel.track.restore();
       mixpanel.register.restore();
-    });
-
-    sinon.stub($, 'getScript').returns(function(name,callback) {
-      onScriptLoad = callback;
-    });
-
-    it('does not call provider without script loaded', function() {
-      analytics.login();
-      expect(mixpanel.identify).to.have.been.notCalled;
-    });
-
-    it('puts data on a queue while waiting for script', function() {
-      analytics.track('action');
-      expect(mixpanelCache).to.eql([['identify'],['track','action']]);
-    });
-
-    it('sends queued data when script loads', function() {
-      onScriptLoad();
-      expect(mixpanel.identify).to.have.been.calledOnce;
-      expect(mixpanel.track).to.have.been.calledOnce;
-      expect(mixpanel.track).to.have.been.calledWith('action');
-    });
-
-    it('flushes the cache after sending data', function() {
-      expect(mixpanelCache).to.not.exist;
     });
 
     it('sets up tracking when user registers', function() {

@@ -54,7 +54,7 @@ angular.module('habitrpg')
               mixpanel.register({'authType':'email','email':data.auth.local.email})
             }
             mixpanel.register({'UUID':data._id,'language':data.preferences.language});
-            mixpanel.track('Registration');
+            Analytics.track('behavior','Registration');
           }
         }).error(errorAlert);
       };
@@ -70,7 +70,7 @@ angular.module('habitrpg')
             if (status == 200) {
               mixpanel.identify(data.id);
               mixpanel.register({'UUID':data._id});
-              mixpanel.track('Login');
+              Analytics.track('behavior','Login');
             }
           }).error(errorAlert);
       };
@@ -146,7 +146,7 @@ angular.module('habitrpg')
               if (status == 200) {
                 mixpanel.identify(data.id);
                 mixpanel.register({'UUID':data._id});
-                mixpanel.track('Login');
+                Analytics.track('behavior','Login');
               }
               runAuth(data.id, data.token);
             }).error(errorAlert);

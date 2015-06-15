@@ -87,7 +87,7 @@ habitrpg.controller('NotificationCtrl',
         Notification.drop(User.user._tmp.drop.dialog);
       }
       $rootScope.playSound('Item_Drop');
-      mixpanel.track("Acquire Item",{'itemName':after.key,'acquireMethod':'Drop'})
+      Analytics.track('behavior','Acquire Item',{'itemName':after.key,'acquireMethod':'Drop'})
     });
 
     $rootScope.$watch('user.achievements.streak', function(after, before){
